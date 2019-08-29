@@ -1,0 +1,168 @@
+Imports System.ComponentModel
+Imports System.IO
+Public Class CONFIGURACION
+    Dim Cosas(15) As String, X As Integer = 0
+    Private ReadOnly rute As String = Path.Combine(Directory.GetCurrentDirectory())
+    Private Sub Save()
+        Crear.BackColor = Color.YellowGreen
+        Save(Baudios.Text)
+        Save(Bdatos.Text)
+        Save(CboParidad.Text)
+        Save(CboSbits.Text)
+        Save(NPuerto.Text)
+        Save(" ")
+        Save(P1.Text)
+        Save(P2.Text)
+        Save(P3.Text)
+        Save(" ")
+        Save(Servidor.Text)
+        Save(Usuario.Text)
+        Save(Password.Text)
+        Save(BaseDatos.Text)
+        Save(Tabla.Text)
+        Save(" ")
+        Save(C1.Text)
+        Save(C2.Text)
+        Save(C3.Text)
+        Save(C4.Text)
+        Save(Area.Text)
+        'File.SetAttributes(rute & "\CONFIG.txt", FileAttributes.Hidden)
+        'File.SetAttributes(rute & "\CONFIG.txt", FileAttributes.ReadOnly)
+        Close()
+    End Sub
+    Private Sub Crear_Click(sender As Object, e As EventArgs) Handles Crear.Click
+        Dim band = True
+        Cosas(0) = Baudios.Text
+        Cosas(1) = P1.Text
+        Cosas(2) = P2.Text
+        Cosas(3) = P3.Text
+        Cosas(4) = Servidor.Text
+        Cosas(5) = Usuario.Text
+        Cosas(6) = Password.Text
+        Cosas(7) = BaseDatos.Text
+        Cosas(8) = Tabla.Text
+        Cosas(9) = C1.Text
+        Cosas(10) = C2.Text
+        Cosas(11) = C3.Text
+        Cosas(12) = C4.Text
+        Cosas(13) = Area.Text
+        Cosas(14) = Bdatos.Text
+        File.Delete(rute & "\CONFIG.txt")
+        For X = 0 To X >= 14
+            If Cosas(X) = "" Or Cosas(X) = " " Then
+                band = False
+                Crear.BackColor = Color.Red
+                MsgBox("El formulario aún no esta completo", MsgBoxStyle.Exclamation, Title:="Campo(s) vacío(s)")
+            End If
+        Next
+        If band Then
+            Save()
+        End If
+    End Sub
+    Private Sub CONFIGURACION_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        NPuerto.Items.Clear()
+        P1.Enabled = False
+        P2.Enabled = False
+        P3.Enabled = False
+        File.Delete(rute & "\CONFIG.txt")
+        Password.UseSystemPasswordChar = True
+        Crear.BackColor = Color.YellowGreen
+        For Each PuertosDisponible As String In My.Computer.Ports.SerialPortNames
+            NPuerto.Items.Add(PuertosDisponible)
+        Next
+        If NPuerto.Items.Count > 0 Then
+            NPuerto.Text = NPuerto.Items(0)
+        Else
+            NPuerto.Items.Clear()
+        End If
+    End Sub
+    Public Function Save(ByVal Linea As String)
+        My.Computer.FileSystem.WriteAllText(rute & "\CONFIG.txt", Linea & vbCrLf, True)
+        Return 0
+    End Function
+    Private Sub OcMo_CheckedChanged(sender As Object, e As EventArgs) Handles OcMo.CheckedChanged
+        If OcMo.Checked Then
+            Password.UseSystemPasswordChar = False
+        Else
+            Password.UseSystemPasswordChar = True
+        End If
+    End Sub
+    Private Sub CONFIGURACION_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        TXRX.Close()
+    End Sub
+    Private Sub BDcon_Click(sender As Object, e As EventArgs) Handles BDcon.Click
+        MsgBox("Direcciones para acceder a base de datos y permitir la escritura", Title:="Conexion con base de datos")
+    End Sub
+    Private Sub BDFields_Click(sender As Object, e As EventArgs) Handles BDFields.Click
+        MsgBox("Se debe colocar el nombre de los campos predefinidos en la base de datos" & vbCrLf &
+               "El primer campo siempre esta concatenado con el area." & vbCrLf &
+               "El resto corresponden al peso bruto, neto y tara, segun el orden de los parametros." & vbCrLf &
+               "Tomar como referencia, las etiquetas que se encuentran a lado de las cajas de texto", Title:="Tabla de BD")
+    End Sub
+    Private Sub SvCl_Click(sender As Object, e As EventArgs) Handles SvCl.Click
+        MsgBox("Cierra el middleware y crea el archivo de configuracion con los datos ingresados en el formulario, para editar el formulario puedes:" & vbCrLf &
+               "1.-Borrar el archivo txt generado en la ruta del middleware" & vbCrLf &
+               "2.-Editar directamete el txt con ayuda del archivo guia", Title:="Save & Close")
+    End Sub
+    Private Sub SendP_Click(sender As Object, e As EventArgs) Handles SendP.Click
+        MsgBox("Caracteres a enviar, cada uno invoca un dato de retorno" & vbCrLf &
+            "A regresa el peso bruto (Gross)" & vbCrLf &
+            "B regresa el peso neto (Net)" & vbCrLf &
+            "C regresa la tara (Tare)", Title:="Comunicacion con indicador")
+    End Sub
+    Private Sub Plantilla_CheckedChanged(sender As Object, e As EventArgs) Handles Plantilla.CheckedChanged
+        If Plantilla.Checked Then
+            Crear.BackColor = Color.YellowGreen
+            P1.Enabled = False
+            P2.Enabled = False
+            P3.Enabled = False
+            Baudios.Text = "9600"
+            Bdatos.Text = "8"
+            CboParidad.Text = "0"
+            CboSbits.Text = "1"
+            P1.Text = "A"
+            P2.Text = "B"
+            P3.Text = "C"
+            Servidor.Text = "192.168.1.88"
+            Usuario.Text = "cliente"
+            Password.Text = "YH88rdLx1IVbUyQH"
+            BaseDatos.Text = "baseprueba"
+            Tabla.Text = "pesaje"
+            C1.Text = "Area"
+            C2.Text = "gross"
+            C3.Text = "net"
+            C4.Text = "tara"
+            Area.Text = "1"
+        Else
+            Crear.BackColor = Color.Red
+            P1.Enabled = True
+            P2.Enabled = True
+            P3.Enabled = True
+            Baudios.Text = ""
+            Bdatos.Text = ""
+            CboParidad.Text = ""
+            CboSbits.Text = ""
+            P1.Text = ""
+            P2.Text = ""
+            P3.Text = ""
+            Servidor.Text = ""
+            Usuario.Text = ""
+            Password.Text = ""
+            BaseDatos.Text = ""
+            Tabla.Text = ""
+            C1.Text = ""
+            C2.Text = ""
+            C3.Text = ""
+            C4.Text = ""
+            Area.Text = ""
+        End If
+    End Sub
+    Private Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            WebBrowser1.Navigate(TextBox1.Text)
+        End If
+    End Sub
+    Private Sub CONFIGURACION_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        TXRX.Close()
+    End Sub
+End Class
